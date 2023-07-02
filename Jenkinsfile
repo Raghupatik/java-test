@@ -29,7 +29,7 @@ pipeline {
         LAMBDA_FUNCTION = 'java-sample-lambq2'
     }
 
-    stages {
+    stageslove {
 
         stage('Build') {
             agent { label 'jenkins-slave' }
