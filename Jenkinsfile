@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'master'}
 
     environment {
         function_name = 'functionforjava'
@@ -16,6 +16,7 @@ pipeline {
         }
 
 
+feature/Docker
         stage("SonarQube analysis") {
              agent any
 
@@ -46,6 +47,37 @@ pipeline {
                  }
              }
          }
+        // stage("SonarQube analysis") {
+        //     agent any
+
+        //     when {
+        //         anyOf {
+        //             branch 'feature/*'
+        //             branch 'main'
+        //         }
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('Sonar') {
+        //             sh 'mvn sonar:sonar'
+        //         }
+        //     }
+        // }
+
+        // stage("Quality Gate") {
+        //     steps {
+        //         script {
+        //             try {
+        //                 timeout(time: 10, unit: 'MINUTES') {
+        //                     waitForQualityGate abortPipeline: true
+        //                 }
+        //             }
+        //             catch (Exception ex) {
+
+        //             }
+        //         }
+        //     }
+        // }
+ main
 
         stage('Push') {
             steps {
@@ -83,6 +115,37 @@ pipeline {
             }
         }
 
+ feature/Docker
+=======
+        // Ci Ended
+
+        // CD Started
+
+        stage('Deployments') {
+            parallel {
+
+                stage('Deploy to Dev') {
+                    steps {
+                        echo 'Build'
+
+                        sh "aws lambda update-function-code --function-name $function_name --region us-east-1 --s3-bucket bermtecbatch31 --s3-key sample-1.0.3.jar"
+                    }
+                }
+
+                stage('Deploy to test ') {
+                    when {
+                        branch 'main'
+                    }
+                    steps {
+                        echo 'Build'
+
+                        // sh "aws lambda update-function-code --function-name $function_name --region us-east-1 --s3-bucket bermtecbatch31 --s3-key sample-1.0.3.jar"
+                    }
+                }
+            }
+        }
+
+ main
         stage('Deploy to Prod') {
             when {
                 branch 'main'
