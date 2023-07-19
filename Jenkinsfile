@@ -1,58 +1,41 @@
 pipeline {
     agent any
 
+    environment {
+        function_name = 'java-sample'
+    }
+
     stages {
         stage('Build') {
             steps {
-                echo 'Build' 
+                echo 'Build'
+                sh 'mvn package'
             }
         }
 
-    stage('Test') {
-        steps {
-            echo 'Testing'
-        }
-    }
+    stage("build & SonarQube analysis") {
+            agent any
+            steps {
+              withSonarQubeEnv('Sonar') {
+                sh 'mvn clean package sonar:sonar'
+              }
+            }
+          }
 
-    stage('Sonar scanning') {
-        steps {
-            echo 'Sonar Scan'
-        }
-    }
-    
-    stage('Publish Artifactory') {
-        steps {
-            echo 'Artifact'
-        }
-    }
+        stage('Push') {
+            steps {
+                echo 'Push'
 
-    stage(Deploy to Dev) {
-        steps {
-            echo 'Dev'
+                sh "aws s3 cp target/sample-1.0.3.jar s3://bucketjeevu"
+            }
         }
-    }
 
-    stage(Deploy to Test) {
-        steps {
-            echo 'Test'
-        }
-    }
+        stage('Deploy') {
+            steps {
+                echo 'Build'
 
-    stage(Deploy to UAT) {
-        steps {
-            echo 'UAT'
-        }
-    }
-
-    stage(Deploy to Stage) {
-        steps {
-            echo 'Stage'
-        }
-    }
-
-    stage(Deploy to Prod) {
-        steps {
-            echo 'Prod'
+                sh "aws lambda update-function-code --function-name $function_name --s3-bucket bucketjeevu --s3-key sample-1.0.3.jar"
+            }
         }
     }
 }
