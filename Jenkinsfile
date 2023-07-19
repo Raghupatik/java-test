@@ -1,41 +1,59 @@
 pipeline {
     agent any
 
-    environment {
-        function_name = 'java-sample'
-    }
-
     stages {
         stage('Build') {
             steps {
                 echo 'Build'
-                sh 'mvn package'
+              
             }
         }
 
-   stage("build & SonarQube analysis") {
-            agent any
-            steps {
-              withSonarQubeEnv('Sonar') {
-                sh 'mvn clean package sonar:sonar'
-              }
-            }
-          }
-
-        stage('Push') {
-            steps {
-                echo 'Push'
-
-                sh "aws s3 cp target/sample-1.0.3.jar s3://bermtecbatch31"
-            }
+    stage('Test') {
+        steps {
+            echo 'Test'
         }
+    }
 
-        stage('Deploy') {
-            steps {
-                echo 'Build'
+    stage('Sonar scanning') {
+        steps {
+            echo 'Sonar Scan'
+        }
+    }
+    
+    stage('Publish Artifactory') {
+        steps {
+            echo 'Artifact'
+        }
+    }
 
-                sh "aws lambda update-function-code --function-name $function_name --s3-bucket bermtecbatch31 --s3-key sample-1.0.3.jar"
-            }
+    stage(Deploy to Dev) {
+        steps {
+            echo 'Dev'
+        }
+    }
+
+    stage(Deploy to Test) {
+        steps {
+            echo 'Test'
+        }
+    }
+
+    stage(Deploy to UAT) {
+        steps {
+            echo 'UAT'
+        }
+    }
+
+    stage(Deploy to Stage) {
+        steps {
+            echo 'Stage'
+        }
+    }
+
+    stage(Deploy to Prod) {
+        steps {
+            echo 'Prod'
         }
     }
 }
