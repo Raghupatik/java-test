@@ -1,5 +1,5 @@
 def checkoutSourceCode() {
-    checkout([$class: 'GitSCM', branches: [[name: "refs/remotes/origin/main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'raghu-github', url: 'https://github.com/Raghupatik/java-test.git']]])
+    checkout([$class: 'GitSCM', branches: [[name: "refs/remotes/origin/feature/test"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'raghu-github', url: 'https://github.com/Raghupatik/java-test.git']]])
 }
 
 pipeline {
@@ -26,7 +26,8 @@ pipeline {
 
     environment {
         S3_BUCKET = 'raghu-jenkinsartifacts'
-        LAMBDA_FUNCTION = 'java-sample-lambq2'
+        LAMBDA_FUNCTION = 'lambq2-test'
+        PROD_LAMBDA_FUNCTION = 'lambq2-prod'
     }
 
     stages {
@@ -71,6 +72,37 @@ pipeline {
 
                     // sh "aws s3 cp target/${JARNAME} s3://$S3_BUCKET"
                     currentBuild.result = 'SUCCESS'
+                }
+            }
+        }
+
+        stage("SonarQube analysis") {
+            agent any
+
+            when {
+                anyOf {
+                    branch 'feature/*'
+                    branch 'main'
+                }
+            }
+            steps {
+                withSonarQubeEnv('Sonar') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                script {
+                    try {
+                        timeout(time: 5, unit: 'MINUTES') {
+                            waitForQualityGate abortPipeline: true
+                        }
+                    }
+                    catch (Exception ex) {
+
+                    }
                 }
             }
         }
@@ -184,7 +216,7 @@ pipeline {
                         retry(3) {
 	            		    sleep 10
                         }
-                       // sh "aws lambda update-function-code --function-name $LAMBDA_FUNCTION --s3-bucket $S3_BUCKET --s3-key ${JARNAME}" 
+                        sh "aws lambda update-function-code --function-name $PROD_LAMBDA_FUNCTION --s3-bucket $S3_BUCKET --s3-key ${JARNAME}" 
                     }
                 }
             }
