@@ -246,4 +246,20 @@ pipeline {
         }
 
     }
+
+    post {
+        always {
+            echo "${env.BUILD_ID}"
+            echo "${BRANCH_NAME}"
+            echo "${BUILD_NUMBER}"
+
+        }
+
+        failure {
+            echo 'failed'
+        }
+        aborted {
+            echo 'aborted'
+        }
+    }
 }
