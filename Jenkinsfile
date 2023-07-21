@@ -82,7 +82,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'feature/*'
-                    branch 'main'
+                    branch 'fetaure/*'
                 }
             }
             steps {
