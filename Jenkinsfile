@@ -166,7 +166,7 @@ pipeline {
                 script {
                     if (currentBuild.result == 'FAILURE' || params.Stage == 'RollbackTestServer') {
                        echo "We need rollback to version: ${RollbackVersion}"
-                       
+                       VERSION = "${RollbackVersion}"
                        ARTIFACTID = readMavenPom().getArtifactId()
 
                        JARNAME = ARTIFACTID+'-'+ "${RollbackVersion}"+'.jar'
