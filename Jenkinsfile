@@ -1,5 +1,5 @@
 def checkoutSourceCode() {
-    checkout([$class: 'GitSCM', branches: [[name: "refs/remotes/origin/main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'raghu-github', url: 'https://github.com/Raghupatik/java-test.git']]])
+    checkout([$class: 'GitSCM', branches: [[name: "refs/remotes/origin/feature/test"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'raghu-github', url: 'https://github.com/Raghupatik/java-test.git']]])
 }
 
 pipeline {
@@ -93,13 +93,6 @@ pipeline {
         }
 
         stage("Quality Gate") {
-             when {
-                anyOf {
-                    branch 'feature/*'
-                    branch 'fetaure/*'
-                }
-            }
-            
             steps {
                 script {
                     try {
@@ -173,7 +166,7 @@ pipeline {
                 script {
                     if (currentBuild.result == 'FAILURE' || params.Stage == 'RollbackTestServer') {
                        echo "We need rollback to version: ${RollbackVersion}"
-                       
+                       VERSION = "${RollbackVersion}"
                        ARTIFACTID = readMavenPom().getArtifactId()
 
                        JARNAME = ARTIFACTID+'-'+ "${RollbackVersion}"+'.jar'
@@ -245,21 +238,5 @@ pipeline {
             }
         }
 
-    }
-
-    post {
-        always {
-            echo "${env.BUILD_ID}"
-            echo "${BRANCH_NAME}"
-            echo "${BUILD_NUMBER}"
-
-        }
-
-        failure {
-            echo 'failed'
-        }
-        aborted {
-            echo 'aborted'
-        }
     }
 }

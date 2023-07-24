@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.example</groupId>
 	<artifactId>sample</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.6</version>
 	<name>sample</name>
 	<packaging>jar</packaging>
 	<description>sample 2022 with Spring Boot</description>
@@ -18,7 +18,7 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<sonar.organization>bermtec</sonar.organization>
+		<sonar.organization>raghu-testing</sonar.organization>
 	</properties>
 	<dependencies>
 	  <dependency>
